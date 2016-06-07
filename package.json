@@ -1,0 +1,18 @@
+{
+  "name": "mean-machine-code",
+  "version": "1.0.0",
+  "description": "The code repository for the book, MEAN Machine.",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/beaconb/trastooo.git"
+  },
+  "dependencies": {
+    "express": "latest",
+    "mongoose": "latest",
+    "passport": "^0.3.2"
+  },
+  "author": "beaconb",
+  "license": "Trastooo",
+  "homepage": "https://github.com/beaconb/trastooo.git"
+}
