@@ -1,14 +1,25 @@
 var express = require('express');
 var app = express();
 var path = require('path');
+var mongoose = require('mongoose');
+var port  	 = process.env.PORT || 7777;
 
 
 //************************************* CREAMOS LAS RUTAS QUE VAMOS A UTILIZAR EN LA APP *********************************************
 var adminRouter = express.Router();
 var userRouter = express.Router();
-var basicRoutes = express.Router();
+var basicRouter = express.Router();
+var promoRouter = express.Router();
+var promos  = require('./app/controllers/promoController');
+var users  = require('./app/controllers/userController');
+var admin  = require('./app/controllers/adminController');
+var basic  = require('./app/controllers/basicController');
 //************************************ FIN DE LAS RUTAS DE LA APP *********************************************************************
 
+//*********************************** ESTABLECEMOS LA CONEXION A LA BB.DD. ************************************************************
+mongoose.connect('mongodb://localhost/promos');
+
+//*********************************** FIN ESTABLECEMOS LA CONEXION A LA BB.DD. ************************************************************
 
 //************************************ MIDDLEWARE PARA INTERCEPTAR LAS RUTAS QUE QUERAMOS EN ESTE PUNTO ********************************
 adminRouter.use(function(req, res, next){
@@ -16,6 +27,10 @@ adminRouter.use(function(req, res, next){
 	next();
 });
 
+promoRouter.use(function(req, res, next){
+ 	console.log(req.method, req.url);
+	next();
+});
 userRouter.use(function(req, res, next){
 	console.log(req.method, req.url);
  	next();
@@ -34,72 +49,52 @@ userRouter.param('name', function(req, res, next, name){
 });
 
 
-basicRoutes.use(function(req, res, next){
+basicRouter.use(function(req, res, next){
  	console.log(req.method, req.url);
  	next();
 });
 //************************************ FIN DEL MIDDLEWARE PARA INTERCEPTAR LAS RUTAS QUE QUEREMOS *****************************************
 
 //************************************ DEFINICION DE LAS RUTAS DEL ADMIN ROUTE ************************************************************
-adminRouter.get('/', function(req, res) { //admin panel (http://localhost:7777/admin/)
- res.send('¡Soy el panel de administración!');
-});
- 
-adminRouter.get('/users', function (req, res) { //users page (http://localhost:7777/admin/users)
- res.send('¡Muestro todos los usuarios!');
-});
- 
-adminRouter.get('/users/:name', function (req, res) { //username page (http://localhost:7777/admin/users/manolo)
- res.send('Hola '+req.params.name+'!');
-});
+adminRouter.get('/', admin.getAll);
+adminRouter.get('/users', admin.getById);
+adminRouter.get('/users/:name', admin.getByName);
 
-adminRouter.get('/promos', function(req, res) { //posts page (http://localhost:7777/admin/promos)
- res.send('¡Muestro todas las promos!');
-});
 //********************************** FIN DE LA DEFINICION DE RUTAS PARA EL ADMIN ROUTE **************************************************** 
 
-//********************************** DEFINICION DE LAS RUTAS PARA LA PARTE DE USUARIOS ****************************************************
-userRouter.get('/', function(req, res) { // user panel (http://localhost:7777/user)
- res.send('¡Soy el panel del usuario!');
-});
- 
-userRouter.get('/profile', function (req, res) { //user profile (http://localhost:7777/user/profile)
- res.send('¡Muestro el perfil del usuario!');
-});
+//********************************** DEFINICION DE LAS RUTAS PARA PROMOS ******************************************************************
+promoRouter.get('/', promos.getAll);
+promoRouter.get('/:id', promos.getById);
+promoRouter.get('/promo/:name', promos.getByName);
 
-userRouter.get('/profile/:name', function (req, res) { //user profile (http://localhost:7777/user/profile/name)
- res.send('Este el perfil del usuario '+req.name+' ...');
-});
+//********************************** FIN DE LAS RUTAS DE PROMOS ***************************************************************************
+
+//********************************** DEFINICION DE LAS RUTAS PARA LA PARTE DE USUARIOS ****************************************************
+userRouter.get('/', users.getAll);
+userRouter.get('/profile', users.getById);
+userRouter.get('/profile/:name', users.getByName);
  
-userRouter.get('/promos', function(req, res) { //user promos (http://localhost:7777/user/promos)
- res.send('¡Muestro todas las promos del usuario!');
-});
 //********************************** FIN DE LA DEFINICION DE RUTAS PARA LA PARTE DE USUARIOS **********************************************
 
 //********************************** DEFINICION DE LAS RUTAS BASICAS **********************************************************************
-basicRoutes.get('/', function(req, res) { //pagina de inicio (http://localhost:7777/)
- res.send('¡Soy la pagina de inicio!');
-});
-
-basicRoutes.get('/login', function(req, res) { //pagina de saludo (http://localhost:7777/juan)
-  res.send('este es el formulario de login');
-});
+basicRouter.get('/', basic.getAll);
+basicRouter.get('/login', basic.getById);
 
 //procesamos el formulario (POST http://localhost:7777/login)
-basicRoutes.post(function(req, res){
-   res.send('procesando el formulario de login');
-  });
+basicRouter.post(basic.saveUser);
 //********************************** FIN DE LAS RUTAS BASICAS ******************************************************************************
 
 //********************************** DEFINICION DE LOS PATHS DE INICIO PARA LAS RUTAS DEFINIDAS ********************************************
-app.use('/',basicRoutes);
-//aplicamos las rutas a nuestra aplicación, app
+app.use('/',basicRouter);
+//aplicamos las rutas de admin a nuestra aplicación, app
 app.use('/admin', adminRouter);
-//aplicamos las rutas a nuestra aplicación, app
+//aplicamos las rutas de usuario a nuestra aplicación, app
 app.use('/user', userRouter);
+//aplicamos las rutas de promociones a nuestra aplicación, app
+app.use('/promos', promoRouter);
 //********************************** FIN DE LA DEFINICION DE LOS PATHS DE INICIO DE LAS RUTAS *********************************************
 
 //************************************* INICIAMOS EL SERVIDOR ******************************************************************************
-app.listen(7777);
+app.listen(port);
 console.log('¡7777 es un puerto maravilloso!');
 //************************************* FIN ************************************************************************************************
