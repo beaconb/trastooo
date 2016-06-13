@@ -2,97 +2,181 @@ var express = require('express');
 var app = express();
 var path = require('path');
 var mongoose = require('mongoose');
+var bodyParser = require('body-parser');
 var port  	 = process.env.PORT || 7777;
 
-
-//************************************* CREAMOS LAS RUTAS QUE VAMOS A UTILIZAR EN LA APP *********************************************
-var adminRouter = express.Router();
-var userRouter = express.Router();
-var basicRouter = express.Router();
-var promoRouter = express.Router();
-var promos  = require('./app/controllers/promoController');
-var users  = require('./app/controllers/userController');
-var admin  = require('./app/controllers/adminController');
-var basic  = require('./app/controllers/basicController');
-//************************************ FIN DE LAS RUTAS DE LA APP *********************************************************************
-
 //*********************************** ESTABLECEMOS LA CONEXION A LA BB.DD. ************************************************************
-mongoose.connect('mongodb://localhost/promos');
+mongoose.connect('mongodb://localhost/trastooo');
 
-//*********************************** FIN ESTABLECEMOS LA CONEXION A LA BB.DD. ************************************************************
-
-//************************************ MIDDLEWARE PARA INTERCEPTAR LAS RUTAS QUE QUERAMOS EN ESTE PUNTO ********************************
-adminRouter.use(function(req, res, next){
- 	console.log(req.method, req.url);
-	next();
+var promoSchema = mongoose.Schema({
+  name: String,
+  url: String,
+  provider: String,
+  fdesde: String,
+  fhasta: String
 });
 
-promoRouter.use(function(req, res, next){
- 	console.log(req.method, req.url);
-	next();
-});
-userRouter.use(function(req, res, next){
-	console.log(req.method, req.url);
- 	next();
-});
-
-userRouter.param('name', function(req, res, next, name){
- //haz aquí la validación de name
- //blah blah blah, validación
- //mostramos en consola para saber si funciona
- console.log('haciendo validaciones de ' + name);
- 
- //una vez hecha la validación guardamos el nuevo objeto en la petición
- req.name = name;
- //pasamos al siguiente asunto
- next();
+var userSchema = mongoose.Schema({
+  name: String,
+  surename: String,
+  username: String,
+  hash: String,
+  falta: String
 });
 
+var Promo = mongoose.model('promos',promoSchema);
+var User = mongoose.model('users',userSchema);
+mongoose.connection;
 
-basicRouter.use(function(req, res, next){
- 	console.log(req.method, req.url);
- 	next();
+app.use(bodyParser.json());
+
+app.get('/promo', function(req, res){
+  //Find all the books in the system.
+  Promo.find({}, function(err, result){
+    if ( err ) throw err;
+    //Save the result into the response object.
+    res.json(result);
+  });
 });
-//************************************ FIN DEL MIDDLEWARE PARA INTERCEPTAR LAS RUTAS QUE QUEREMOS *****************************************
+app.get('/promo/:id', function(req, res){
+  //Find all the books in the system.
+  Promo.findOne({_id: req.params.id}, function(err, result){
+    if ( err ) throw err;
+    //Save the result into the response object.
+    res.json(result);
+  });
+});
 
-//************************************ DEFINICION DE LAS RUTAS DEL ADMIN ROUTE ************************************************************
-adminRouter.get('/', admin.getAll);
-adminRouter.get('/users', admin.getById);
-adminRouter.get('/users/:name', admin.getByName);
+app.post("/promo", function(req, res){
+//  console.log("Adding new Promo: " + req.body.name);
+  var promo = new Promo({
+    name:req.body.name,
+    provider: req.body.provider,
+    url: req.body.url,
+    fdesde: req.body.fdesde,
+    fhasta: req.body.fhasta
+  });
 
-//********************************** FIN DE LA DEFINICION DE RUTAS PARA EL ADMIN ROUTE **************************************************** 
+  //Saving the model instance to the DB
+  promo.save(function(err, result){
+    if ( err ) throw err;
+    //After successfully saving the book we generate a JSON response with the
+    //message and the inserted book information.
+    res.json({
+      messaage:"Successfully added promo",
+      promo:result
+    });
+   });
+});
+//Update an existing promo
+app.put("/promo/:id", function(req, res){
+  Promo.findOne({_id: req.params.id}, function(err, result){
+    if ( err ) throw err;
 
-//********************************** DEFINICION DE LAS RUTAS PARA PROMOS ******************************************************************
-promoRouter.get('/', promos.getAll);
-promoRouter.get('/:id', promos.getById);
-promoRouter.get('/promo/:name', promos.getByName);
+    if(!result){
+      res.json({
+        message:"Promo with id: " + req.params.id+" not found.",
+      });
+    }
+    console.log('Promo: '+result.name+' y por parametro:'+req.body.name);
+    result.name   = req.body.name;
+    result.provider   = req.body.provider;
+    result.url = req.body.url;
+    result.fdesde  = req.body.fdesde;
+    result.fhasta = req.body.fhasta;
 
-//********************************** FIN DE LAS RUTAS DE PROMOS ***************************************************************************
+    result.save(function(err, result){
+      if ( err ) throw err;
+      res.json({
+        message:"Successfully updated the promo",
+        promo: result
+      });
+    });
+//Delete an existing promo
+app.delete("/promo/:id", function(req, res){
+  Promo.findOneAndRemove({_id: req.params.id}, function(err, result){
+      res.json({
+        message: "Successfully deleted the promo",
+        promo: result
+      });
+  });
+});
+  });
+});
 
-//********************************** DEFINICION DE LAS RUTAS PARA LA PARTE DE USUARIOS ****************************************************
-userRouter.get('/', users.getAll);
-userRouter.get('/profile', users.getById);
-userRouter.get('/profile/:name', users.getByName);
- 
-//********************************** FIN DE LA DEFINICION DE RUTAS PARA LA PARTE DE USUARIOS **********************************************
+app.get('/user', function(req, res){
+  //Find all the books in the system.
+  User.find({}, function(err, result){
+    if ( err ) throw err;
+    //Save the result into the response object.
+    res.json(result);
+  });
+});
+app.get('/user/:id', function(req, res){
+  //Find all the books in the system.
+  Promo.findOne({_id: req.params.id}, function(err, result){
+    if ( err ) throw err;
+    //Save the result into the response object.
+    res.json(result);
+  });
+});
 
-//********************************** DEFINICION DE LAS RUTAS BASICAS **********************************************************************
-basicRouter.get('/', basic.getAll);
-basicRouter.get('/login', basic.getById);
+app.post("/user", function(req, res){
+//  console.log("Adding new Promo: " + req.body.name);
+  var user = new User({
+  	name: req.body.name,
+  surename:req.body.surename,
+  username: req.body.username,
+  hash: req.body.hash,
+  falta: req.body.flata
+  });
 
-//procesamos el formulario (POST http://localhost:7777/login)
-basicRouter.post(basic.saveUser);
-//********************************** FIN DE LAS RUTAS BASICAS ******************************************************************************
+  //Saving the model instance to the DB
+  user.save(function(err, result){
+    if ( err ) throw err;
+    //After successfully saving the book we generate a JSON response with the
+    //message and the inserted book information.
+    res.json({
+      messaage:"Successfully added user",
+      user:result
+    });
+   });
+});
+//Update an existing promo
+app.put("/user/:id", function(req, res){
+  User.findOne({_id: req.params.id}, function(err, result){
+    if ( err ) throw err;
 
-//********************************** DEFINICION DE LOS PATHS DE INICIO PARA LAS RUTAS DEFINIDAS ********************************************
-app.use('/',basicRouter);
-//aplicamos las rutas de admin a nuestra aplicación, app
-app.use('/admin', adminRouter);
-//aplicamos las rutas de usuario a nuestra aplicación, app
-app.use('/user', userRouter);
-//aplicamos las rutas de promociones a nuestra aplicación, app
-app.use('/promos', promoRouter);
-//********************************** FIN DE LA DEFINICION DE LOS PATHS DE INICIO DE LAS RUTAS *********************************************
+    if(!result){
+      res.json({
+        message:"User with id: " + req.params.id+" not found.",
+      });
+    }
+    console.log('User: '+result.name+' y por parametro:'+req.body.name);
+    result.name   = req.body.name;
+    result.surename   = req.body.surename;
+    result.username = req.body.username;
+    result.hash  = req.body.hash;
+    result.falta = req.body.falta;
+
+    result.save(function(err, result){
+      if ( err ) throw err;
+      res.json({
+        message:"Successfully updated the promo",
+        user: result
+      });
+    });
+//Delete an existing promo
+app.delete("/user/:id", function(req, res){
+  User.findOneAndRemove({_id: req.params.id}, function(err, result){
+      res.json({
+        message: "Successfully deleted the promo",
+        user: result
+      });
+  });
+});
+  });
+});
 
 //************************************* INICIAMOS EL SERVIDOR ******************************************************************************
 app.listen(port);
