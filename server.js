@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var mongoose = require('mongoose');
-var port  	 = process.env.PORT || 7777;
+var port  	 = process.env.PORT || 80;
 
 //*********************************** ESTABLECEMOS LA CONEXION A LA BB.DD. ************************************************************
 
