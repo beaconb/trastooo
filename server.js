@@ -5,7 +5,8 @@ var port  	 = process.env.PORT || 7777;
 
 //*********************************** ESTABLECEMOS LA CONEXION A LA BB.DD. ************************************************************
 
-mongoose.connect('mongodb://localhost/trastooo');
+mongoose.connect('mongodb://beaconb:Trast000@ds013584.mlab.com:13584/trastooo');
+//mongoose.connect('mongodb://localhost/trastooo');
 
 require('./app/routes/promoRoutes')(app);
 require('./app/routes/userRoutes')(app);

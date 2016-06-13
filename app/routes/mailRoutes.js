@@ -26,7 +26,7 @@ module.exports = function(app){
             if(error){
                  console.log('Error: ' +error);
             }else{
-                console.log('Message sent: ' );
+                console.log('Message sent: '+info.response );
             };
         });
     });
