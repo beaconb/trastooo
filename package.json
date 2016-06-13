@@ -11,7 +11,8 @@
     "express": "latest",
     "mongoose": "latest",
     "body-parser": "latest",
-    "passport": "^0.3.2"
+    "passport": "^0.3.2",
+    "nodemailer":"latest"
   },
   "author": "beaconb",
   "license": "Trastooo",

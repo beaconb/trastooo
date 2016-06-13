@@ -9,6 +9,7 @@ mongoose.connect('mongodb://localhost/trastooo');
 
 require('./app/routes/promoRoutes')(app);
 require('./app/routes/userRoutes')(app);
+require('./app/routes/mailRoutes')(app);
 
 //************************************* INICIAMOS EL SERVIDOR ******************************************************************************
 app.listen(port);
