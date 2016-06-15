@@ -4,11 +4,11 @@ var bodyParser = require('body-parser');
 Promo = require('../model/promo');
 
 module.exports = function(app){
-	app.use(bodyParser.json());
+//	app.use(bodyParser.json());
 	app.get('/promo', function(req, res){
 	  //Find all the books in the system.
 	  Promo.find({}, function(err, result){
-	    if ( err ) throw err;
+	    if ( err ) res.send(err);
 	    //Save the result into the response object.
 	    res.json(result);
 	  });
@@ -16,7 +16,7 @@ module.exports = function(app){
 	app.get('/promo/:id', function(req, res){
 	  //Find all the books in the system.
 	  Promo.findOne({_id: req.params.id}, function(err, result){
-	    if ( err ) throw err;
+	    if ( err ) res.send(err);
 	    //Save the result into the response object.
 	    res.json(result);
 	  });
@@ -25,7 +25,7 @@ module.exports = function(app){
 	app.get('/promo/name/:name', function(req, res){
 	  //Find all the books in the system.
 	  Promo.find({nombre: req.params.name}, function(err, result){
-	    if ( err ) throw err;
+	    if ( err ) res.send(err);
 	    //Save the result into the response object.
 	    res.json(result);
 	  });
@@ -33,7 +33,7 @@ module.exports = function(app){
 	app.get('/promo/enterprise/:enterprise', function(req, res){
 	  //Find all the books in the system.
 	  Promo.find({empresa: req.params.enterprise}, function(err, result){
-	    if ( err ) throw err;
+	    if ( err ) res.send(err);
 	    //Save the result into the response object.
 	    res.json(result);
 	  });
@@ -41,7 +41,7 @@ module.exports = function(app){
 	app.get('/promo/provider/:provider', function(req, res){
 	  //Find all the books in the system.
 	  Promo.find({proveedor: req.params.provider}, function(err, result){
-	    if ( err ) throw err;
+	    if ( err ) res.send(err);
 	    //Save the result into the response object.
 	    res.json(result);
 	  });
@@ -49,7 +49,7 @@ module.exports = function(app){
 	app.get('/promo/datefrom/:datefrom', function(req, res){
 	  //Find all the books in the system.
 	  Promo.find({fdesde: req.params.datefrom}, function(err, result){
-	    if ( err ) throw err;
+	    if ( err ) res.send(err);
 	    //Save the result into the response object.
 	    res.json(result);
 	  });
@@ -57,7 +57,7 @@ module.exports = function(app){
 	app.get('/promo/dateto/:dateto', function(req, res){
 	  //Find all the books in the system.
 	  Promo.find({fhasta: req.params.dateto}, function(err, result){
-	    if ( err ) throw err;
+	    if ( err ) res.send(err);
 	    //Save the result into the response object.
 	    res.json(result);
 	  });
@@ -65,7 +65,7 @@ module.exports = function(app){
 	app.get('/promo/system/:medio', function(req, res){
 	  //Find all the books in the system.
 	  Promo.find({medio: req.params.medio}, function(err, result){
-	    if ( err ) throw err;
+	    if ( err ) res.send(err);
 	    //Save the result into the response object.
 	    res.json(result);
 	  });
@@ -74,7 +74,7 @@ module.exports = function(app){
 	app.get('/promo/city/:city', function(req, res){
 	  //Find all the books in the system.
 	  Promo.find({poblacion: req.params.city}, function(err, result){
-	    if ( err ) throw err;
+	    if ( err ) res.send(err);
 	    //Save the result into the response object.
 	    res.json(result);
 	  });
@@ -100,7 +100,7 @@ module.exports = function(app){
 
 	  //Saving the model instance to the DB
 	  promo.save(function(err, result){
-	    if ( err ) throw err;
+	    if ( err ) res.send(err);
 	    //After successfully saving the book we generate a JSON response with the
 	    //message and the inserted book information.
 	    res.json({
@@ -112,7 +112,7 @@ module.exports = function(app){
 	//Update an existing promo
 	app.put("/promo/:id", function(req, res){
 	  Promo.findOne({_id: req.params.id}, function(err, result){
-	    if ( err ) throw err;
+	    if ( err ) res.send(err);
 
 	    if(!result){
 	      res.json({
@@ -136,7 +136,7 @@ module.exports = function(app){
 	  	result.condiciones=req.body.condiciones;
 
 	    result.save(function(err, result){
-	      if ( err ) throw err;
+	      if ( err ) res.send(err);
 	      res.json({
 	        message:"Successfully updated the promo",
 	        promo: result

@@ -5,27 +5,27 @@ var bodyParser = require('body-parser');
 User = require('../model/user');
 
 module.exports = function(app){
-  app.use(bodyParser.json());
+//  app.use(bodyParser.json());
   app.get('/user', function(req, res){
     //Find all the books in the system.
-    User.find({}, function(err, result){
-      if ( err ) throw err;
+    User.find({}, function(err, users){
+      if ( err ) res.send(err);
       //Save the result into the response object.
-      res.json(result);
+      res.json(users);
     });
   });
   app.get('/user/:id', function(req, res){
     //Find all the books in the system.
-    User.findOne({_id: req.params.id}, function(err, result){
-      if ( err ) throw err;
+    User.findOne({_id: req.params.id}, function(err, user){
+      if ( err ) res.send(err);
       //Save the result into the response object.
-      res.json(result);
+      res.json(user);
     });
   });
 
   app.post("/user", function(req, res){
   //  console.log("Adding new Promo: " + req.body.name);
-    var user = new User({
+    var userParam = new User({
     	name: req.body.name,
       surename:req.body.surename,
       username: req.body.username,
@@ -34,48 +34,48 @@ module.exports = function(app){
     });
 
     //Saving the model instance to the DB
-    user.save(function(err, result){
+    User.save(function(err, user){
       if ( err ) throw err;
       //After successfully saving the book we generate a JSON response with the
       //message and the inserted book information.
       res.json({
         messaage:"Successfully added user",
-        user:result
+        userParam:user
       });
      });
   });
   //Update an existing promo
   app.put("/user/:id", function(req, res){
-    User.findOne({_id: req.params.id}, function(err, result){
-      if ( err ) throw err;
+    User.findOne({_id: req.params.id}, function(err, user){
+      if ( err ) res.send(err);
 
-      if(!result){
+      if(!user){
         res.json({
           message:"User with id: " + req.params.id+" not found.",
         });
       }
 //      console.log('User: '+result.name+' y por parametro:'+req.body.name);
-      result.name   = req.body.name;
-      result.surename   = req.body.surename;
-      result.username = req.body.username;
-      result.hash  = req.body.hash;
-      result.falta = req.body.falta;
+      user.name   = req.body.name;
+      user.surename   = req.body.surename;
+      user.username = req.body.username;
+      user.hash  = req.body.hash;
+      user.falta = req.body.falta;
 
-      result.save(function(err, result){
-        if ( err ) throw err;
+      user.save(function(err, userResult){
+        if ( err ) res.send(err);
         res.json({
           message:"Successfully updated the user",
-          user: result
+          user: userResult
         });
       });
     });
   });
   //Delete an existing promo
   app.delete("/user/:id", function(req, res){
-    User.findOneAndRemove({_id: req.params.id}, function(err, result){
+    User.findOneAndRemove({_id: req.params.id}, function(err, userResult){
         res.json({
           message: "Successfully deleted the user",
-          user: result
+          user: userResult
         });
     });
   });
